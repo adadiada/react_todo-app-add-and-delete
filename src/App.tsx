@@ -71,7 +71,7 @@ export const App: React.FC = () => {
   function addTodo({ title, completed, userId }: Todo) {
     setLoading(true);
 
-    apiServiceTodos
+    return apiServiceTodos
       .createTodo({ title, completed, userId })
       .then(newTodo => {
         setTodos(cur => [...cur, newTodo]);
@@ -86,11 +86,10 @@ export const App: React.FC = () => {
   }
 
   function deleteTodos(todoId: number) {
-    apiServiceTodos
+    setTodos(current => current.filter(todo => todo.id !== todoId));
+
+    return apiServiceTodos
       .deleteTodo(todoId)
-      .then(() => {
-        setTodos(current => current.filter(todo => todo.id !== todoId));
-      })
       .catch(() => setError('Unable to delete a todo'));
   }
 

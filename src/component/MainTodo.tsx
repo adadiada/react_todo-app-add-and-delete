@@ -67,9 +67,11 @@ export const MainTodo: React.FC<Props> = ({
               readOnly
             />
           </label>
+
           <span data-cy="TodoTitle" className="todo__title">
             {tempTodo.title}
           </span>
+
           <button
             type="button"
             className="todo__remove"
