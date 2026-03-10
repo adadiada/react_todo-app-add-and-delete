@@ -6,6 +6,7 @@ type Props = {
   setTitle: (s: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   allCompleted: boolean;
+  loading: boolean;
 };
 
 export const Header: React.FC<Props> = ({
@@ -13,12 +14,14 @@ export const Header: React.FC<Props> = ({
   setTitle,
   handleSubmit,
   allCompleted,
+  loading,
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    if(!loading) {
     inputRef.current?.focus();
-  }, []);
+  }}, [loading]);
 
   return (
     <header className="todoapp__header">
@@ -38,7 +41,7 @@ export const Header: React.FC<Props> = ({
           value={title}
           onChange={e => setTitle(e.target.value)}
           ref={inputRef}
-          autoFocus
+          disabled={loading}
         />
       </form>
     </header>

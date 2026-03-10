@@ -20,6 +20,7 @@ export const App: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<Filter>(Filter.All);
+  const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
   // const toggleTodo = (id: number) => {
   //   setTodos(prevTodos =>
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
@@ -51,32 +53,44 @@ export const App: React.FC = () => {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    setTempTodo({
+      id: 0,
+      title: trimmedTitle,
+      completed: false,
+      userId: USER_ID,
+    });
+
     addTodo({
       title: trimmedTitle,
       completed: false,
       userId: USER_ID,
-    } as unknown as Todo);
-    setTitle('');
+    });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   function addTodo({ title, completed, userId }: Todo) {
+    setLoading(true);
+
     apiServiceTodos
       .createTodo({ title, completed, userId })
       .then(newTodo => {
-        setTodos(currentTodos => [...currentTodos, newTodo]);
+        setTodos(cur => [...cur, newTodo]);
+        setTitle('');
+        setTempTodo(null);
       })
-      .catch(() => setError('Unable to add a todo'));
+      .catch(() => {
+        setError('Unable to add a todo');
+        setTempTodo(null);
+      })
+      .finally(() => setLoading(false));
   }
 
-  async function deleteTodos(todoId: number) {
-    try {
-      await apiServiceTodos.deleteTodo(todoId);
-      setTodos(currentTodo => currentTodo.filter(todo => todo.id !== todoId));
-    } catch {
-      setError('Unable to add a todo');
-    }
+  function deleteTodos(todoId: number) {
+    apiServiceTodos
+      .deleteTodo(todoId)
+      .then(() => {
+        setTodos(current => current.filter(todo => todo.id !== todoId));
+      })
+      .catch(() => setError('Unable to delete a todo'));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -95,6 +109,21 @@ export const App: React.FC = () => {
     loadTodo();
   }, []);
 
+  const onClear = () => {
+    const completedTodos = todos.filter(todo => todo.completed);
+
+    Promise.allSettled(
+      completedTodos.map(todo =>
+        apiServiceTodos
+          .deleteTodo(todo.id)
+          .then(() =>
+            setTodos(current => current.filter(t => t.id !== todo.id)),
+          )
+          .catch(() => setError('Unable to delete a todo')),
+      ),
+    );
+  };
+
   if (!USER_ID) {
     return <UserWarning />;
   }
@@ -108,7 +137,6 @@ export const App: React.FC = () => {
           setTitle={setTitle}
           handleSubmit={handleSubmit}
           allCompleted={todos.length > 0 && todos.every(t => t.completed)}
-          onSubmit={addTodo}
           loading={loading}
         />
 
@@ -116,6 +144,7 @@ export const App: React.FC = () => {
           todos={todos}
           filteredTodos={filteredTodos}
           deleteTodo={deleteTodos}
+          tempTodo={tempTodo}
         />
 
         <Error error={error} onCloseError={() => setError('')} />

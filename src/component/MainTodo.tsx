@@ -5,12 +5,14 @@ type Props = {
   todos: Todo[];
   filteredTodos: Todo[];
   deleteTodo: (id: number) => void;
+  tempTodo: Todo | null;
 };
 
 export const MainTodo: React.FC<Props> = ({
   todos,
   filteredTodos,
   deleteTodo,
+  tempTodo,
 }) => {
   return (
     <section
@@ -22,7 +24,6 @@ export const MainTodo: React.FC<Props> = ({
           key={todo.id}
           data-cy="Todo"
           className={todo.completed ? 'todo completed' : 'todo'}
-          // eslint-disable-next-line react/jsx-no-comment-textnodes
         >
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="todo__status-label">
@@ -34,7 +35,7 @@ export const MainTodo: React.FC<Props> = ({
             />
           </label>
           <span data-cy="TodoTitle" className="todo__title">
-            {todo.title}
+            {tempTodo.title}
           </span>
           <button
             type="button"
