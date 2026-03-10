@@ -1,5 +1,6 @@
 import { Todo } from '../types/Todo';
 import * as React from 'react';
+import cn from 'classnames';
 
 type Props = {
   todos: Todo[];
@@ -23,7 +24,7 @@ export const MainTodo: React.FC<Props> = ({
         <div
           key={todo.id}
           data-cy="Todo"
-          className={todo.completed ? 'todo completed' : 'todo'}
+          className={cn('todo', { completed: todo.completed })}
         >
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="todo__status-label">
@@ -32,10 +33,11 @@ export const MainTodo: React.FC<Props> = ({
               type="checkbox"
               className="todo__status"
               checked={todo.completed}
+              readOnly
             />
           </label>
           <span data-cy="TodoTitle" className="todo__title">
-            {tempTodo.title}
+            {todo.title}
           </span>
           <button
             type="button"
@@ -45,12 +47,43 @@ export const MainTodo: React.FC<Props> = ({
           >
             ×
           </button>
-          <div data-cy="TodoLoader" className="modal overlay">
+        </div>
+      ))}
+      {tempTodo && (
+        <div
+          key="tempTodo"
+          data-cy="Todo"
+          className={cn('todo', {
+            completed: tempTodo.completed,
+          })}
+        >
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control*/}
+          <label className="todo__status-label">
+            <input
+              data-cy="TodoStatus"
+              type="checkbox"
+              className="todo__status"
+              checked={tempTodo.completed}
+              readOnly
+            />
+          </label>
+          <span data-cy="TodoTitle" className="todo__title">
+            {tempTodo.title}
+          </span>
+          <button
+            type="button"
+            className="todo__remove"
+            data-cy="TodoDelete"
+            onClick={() => {}}
+          >
+            ×
+          </button>
+          <div data-cy="TodoLoader" className="modal overlay is-active">
             <div className="modal-background has-background-white-ter" />
             <div className="loader" />
           </div>
         </div>
-      ))}
+      )}
     </section>
   );
 };

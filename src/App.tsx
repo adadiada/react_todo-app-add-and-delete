@@ -67,6 +67,7 @@ export const App: React.FC = () => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   function addTodo({ title, completed, userId }: Todo) {
     setLoading(true);
 
