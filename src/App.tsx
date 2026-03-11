@@ -60,6 +60,7 @@ export const App: React.FC = () => {
       userId: USER_ID,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     addTodo({
       title: trimmedTitle,
       completed: false,
@@ -68,7 +69,7 @@ export const App: React.FC = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  function addTodo({ title, completed, userId }: Todo) {
+  function addTodo({ title, completed, userId }: Omit<Todo, 'id'>) {
     setLoading(true);
 
     return apiServiceTodos
