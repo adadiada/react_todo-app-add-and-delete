@@ -19,10 +19,8 @@ export const Header: React.FC<Props> = ({
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (!loading) {
-      inputRef.current?.focus();
-    }
-  }, [loading]);
+    inputRef.current?.focus();
+  });
 
   return (
     <header className="todoapp__header">
