@@ -21,6 +21,7 @@ export const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<Filter>(Filter.All);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
+  const [loadingTodoId, setLoadingTodoId] = useState<number | null>(null);
 
   // const toggleTodo = (id: number) => {
   //   setTodos(prevTodos =>
@@ -71,6 +72,7 @@ export const App: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function addTodo({ title, completed, userId }: Omit<Todo, 'id'>) {
     setLoading(true);
+    setLoadingTodoId(null);
 
     return apiServiceTodos
       .createTodo({ title, completed, userId })
@@ -83,16 +85,37 @@ export const App: React.FC = () => {
         setError('Unable to add a todo');
         setTempTodo(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setLoadingTodoId(null);
+      });
   }
 
   function deleteTodos(todoId: number) {
-    setTodos(current => current.filter(todo => todo.id !== todoId));
+    setLoadingTodoId(todoId);
 
     return apiServiceTodos
       .deleteTodo(todoId)
-      .catch(() => setError('Unable to delete a todo'));
+      .then(() => {
+        setTodos(current => current.filter(todo => todo.id !== todoId));
+      })
+      .catch(() => setError('Unable to delete a todo'))
+      .finally(() => setLoadingTodoId(null));
   }
+
+  // function updateTodo(updatedTodo: Todo) {
+  //   apiServiceTodos.updateTodo(updatedTodo).then(todo => {
+  //     setTodos(currentTodos => {
+  //       const newTodos = [...currentTodos];
+  //       // eslint-disable-next-line @typescript-eslint/no-shadow
+  //       const index = newTodos.findIndex(todo => todo.id === updatedTodo.id);
+
+  //       newTodos.splice(index, 1, todo);
+
+  //       return newTodos;
+  //     });
+  //   });
+  // }
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   function loadTodo() {
@@ -146,8 +169,8 @@ export const App: React.FC = () => {
           filteredTodos={filteredTodos}
           deleteTodo={deleteTodos}
           tempTodo={tempTodo}
+          loadingTodoId={loadingTodoId}
         />
-
         <Error error={error} onCloseError={() => setError('')} />
 
         {todos.length > 0 && (

@@ -7,6 +7,7 @@ type Props = {
   filteredTodos: Todo[];
   deleteTodo: (id: number) => void;
   tempTodo: Todo | null;
+  loadingTodoId: number | null;
 };
 
 export const MainTodo: React.FC<Props> = ({
@@ -14,10 +15,11 @@ export const MainTodo: React.FC<Props> = ({
   filteredTodos,
   deleteTodo,
   tempTodo,
+  loadingTodoId,
 }) => {
   return (
     <section
-      className={`todoapp__main ${todos.length === 0 ? 'hidden' : ''}`}
+      className={`todoapp__main ${todos.length === 0 && !tempTodo ? 'hidden' : ''}`}
       data-cy="TodoList"
     >
       {filteredTodos.map(todo => (
@@ -47,6 +49,15 @@ export const MainTodo: React.FC<Props> = ({
           >
             ×
           </button>
+          <div
+            data-cy="TodoLoader"
+            className={cn('modal overlay', {
+              'is-active': loadingTodoId === todo.id,
+            })}
+          >
+            <div className="modal-background has-background-white-ter" />
+            <div className="loader" />
+          </div>
         </div>
       ))}
       {tempTodo && (
@@ -80,10 +91,6 @@ export const MainTodo: React.FC<Props> = ({
           >
             ×
           </button>
-          <div data-cy="TodoLoader" className="modal overlay is-active">
-            <div className="modal-background has-background-white-ter" />
-            <div className="loader" />
-          </div>
         </div>
       )}
     </section>
